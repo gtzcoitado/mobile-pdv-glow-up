@@ -1,0 +1,140 @@
+
+import { useState } from 'react';
+import ProductCard from '@/components/ProductCard';
+import CartItem from '@/components/CartItem';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Search, ShoppingCart } from 'lucide-react';
+
+interface CartItemType {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+const PDV = () => {
+  const [cart, setCart] = useState<CartItemType[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const products = [
+    { id: '1', name: 'Brahma', price: 5.00, group: 'Geral', stock: 134 },
+    { id: '2', name: 'Pão', price: 1.00, group: 'Geral', stock: 113 },
+    { id: '3', name: 'Coca-Cola', price: 4.50, group: 'Bebidas', stock: 45 },
+    { id: '4', name: 'Água', price: 2.00, group: 'Bebidas', stock: 89 },
+  ];
+
+  const addToCart = (product: typeof products[0]) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        return prev.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+  };
+
+  const updateQuantity = (id: string, change: number) => {
+    setCart(prev =>
+      prev.map(item =>
+        item.id === id
+          ? { ...item, quantity: Math.max(0, item.quantity + change) }
+          : item
+      ).filter(item => item.quantity > 0)
+    );
+  };
+
+  const removeFromCart = (id: string) => {
+    setCart(prev => prev.filter(item => item.id !== id));
+  };
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="flex flex-col lg:flex-row h-full gap-6 p-6">
+      {/* Products Section */}
+      <div className="flex-1 space-y-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+          <Input
+            placeholder="Buscar produtos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-12 rounded-xl border-2 border-slate-200 focus:border-blue-400 transition-colors duration-200"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredProducts.map(product => (
+            <ProductCard
+              key={product.id}
+              name={product.name}
+              price={product.price}
+              group={product.group}
+              stock={product.stock}
+              onAdd={() => addToCart(product)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Cart Section */}
+      <div className="w-full lg:w-96 space-y-4">
+        <Card className="p-6 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
+          <div className="flex items-center mb-4">
+            <ShoppingCart className="mr-2 h-5 w-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-slate-800">Carrinho</h2>
+            <span className="ml-auto text-sm text-slate-500">
+              {cart.length} {cart.length === 1 ? 'item' : 'itens'}
+            </span>
+          </div>
+
+          <div className="space-y-3 max-h-60 lg:max-h-96 overflow-y-auto">
+            {cart.length === 0 ? (
+              <p className="text-center text-slate-500 py-8">Carrinho vazio</p>
+            ) : (
+              cart.map(item => (
+                <CartItem
+                  key={item.id}
+                  name={item.name}
+                  price={item.price}
+                  quantity={item.quantity}
+                  onIncrease={() => updateQuantity(item.id, 1)}
+                  onDecrease={() => updateQuantity(item.id, -1)}
+                  onRemove={() => removeFromCart(item.id)}
+                />
+              ))
+            )}
+          </div>
+
+          <div className="border-t border-slate-200 pt-4 mt-4">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-lg font-semibold text-slate-700">Subtotal:</span>
+              <span className="text-xl font-bold text-green-600">
+                R$ {subtotal.toFixed(2)}
+              </span>
+            </div>
+            
+            <Button 
+              className="w-full h-12 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              disabled={cart.length === 0}
+            >
+              Ir para Pagamento
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default PDV;
