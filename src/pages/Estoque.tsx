@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Search, Plus, Minus } from 'lucide-react';
+import { Search, Plus, Minus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -112,85 +112,6 @@ const Estoque = () => {
         </div>
       </div>
 
-      {adjustingItem && (
-        <Card className="p-6 bg-white shadow-md border-2 border-blue-100">
-          <h2 className="text-xl font-semibold text-slate-800 mb-4">
-            Ajuste de Estoque: {adjustingItem.name}
-          </h2>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Estoque atual:</p>
-                <p className="font-semibold text-lg">{adjustingItem.current}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-500">Mínimo:</p>
-                <p className="font-semibold text-lg">{adjustingItem.min}</p>
-              </div>
-            </div>
-            
-            <Tabs defaultValue="in" onValueChange={(v) => setAdjustType(v as 'in' | 'out')}>
-              <TabsList className="w-full grid grid-cols-2">
-                <TabsTrigger value="in" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Entrada
-                </TabsTrigger>
-                <TabsTrigger value="out" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">
-                  <Minus className="mr-2 h-4 w-4" />
-                  Saída
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="in" className="mt-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">
-                    Quantidade a adicionar
-                  </label>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={adjustQuantity}
-                    onChange={(e) => setAdjustQuantity(e.target.value)}
-                    className="h-12 border-slate-300 bg-slate-50"
-                  />
-                </div>
-              </TabsContent>
-              <TabsContent value="out" className="mt-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">
-                    Quantidade a remover
-                  </label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max={adjustingItem.current.toString()}
-                    value={adjustQuantity}
-                    onChange={(e) => setAdjustQuantity(e.target.value)}
-                    className="h-12 border-slate-300 bg-slate-50"
-                  />
-                </div>
-              </TabsContent>
-            </Tabs>
-            
-            <div className="flex gap-3 pt-2">
-              <Button
-                onClick={handleConfirmAdjust}
-                className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-md"
-              >
-                Confirmar Ajuste
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 h-12 border-slate-300"
-                onClick={() => setAdjustingItem(null)}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </Card>
-      )}
-
       <div className="space-y-3">
         {filteredItems.map(item => (
           <Card key={item.id} className="p-4 bg-gradient-to-r from-white to-slate-50 border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg">
@@ -216,6 +137,82 @@ const Estoque = () => {
                 Ajustar
               </Button>
             </div>
+
+            {adjustingItem && adjustingItem.id === item.id && (
+              <div className="mt-4 pt-4 border-t border-slate-200 animate-fade-in">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-slate-500">Estoque atual:</p>
+                      <p className="font-semibold text-lg">{adjustingItem.current}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">Mínimo:</p>
+                      <p className="font-semibold text-lg">{adjustingItem.min}</p>
+                    </div>
+                  </div>
+                  
+                  <Tabs defaultValue="in" onValueChange={(v) => setAdjustType(v as 'in' | 'out')}>
+                    <TabsList className="w-full grid grid-cols-2">
+                      <TabsTrigger value="in" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Entrada
+                      </TabsTrigger>
+                      <TabsTrigger value="out" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">
+                        <Minus className="mr-2 h-4 w-4" />
+                        Saída
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="in" className="mt-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">
+                          Quantidade a adicionar
+                        </label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={adjustQuantity}
+                          onChange={(e) => setAdjustQuantity(e.target.value)}
+                          className="h-12 border-slate-300 bg-slate-50"
+                        />
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="out" className="mt-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">
+                          Quantidade a remover
+                        </label>
+                        <Input
+                          type="number"
+                          min="1"
+                          max={adjustingItem.current.toString()}
+                          value={adjustQuantity}
+                          onChange={(e) => setAdjustQuantity(e.target.value)}
+                          className="h-12 border-slate-300 bg-slate-50"
+                        />
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                  
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      onClick={handleConfirmAdjust}
+                      className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-md"
+                    >
+                      <Check className="mr-2 h-4 w-4" />
+                      Confirmar Ajuste
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 h-12 border-slate-300"
+                      onClick={() => setAdjustingItem(null)}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </Card>
         ))}
       </div>

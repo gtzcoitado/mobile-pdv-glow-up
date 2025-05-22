@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -56,7 +56,7 @@ const Grupos = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-slate-800">Cadastro de Grupos</h1>
         <Button 
-          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg rounded-xl w-full sm:w-auto"
+          className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-lg rounded-xl w-full sm:w-auto"
           onClick={handleAddGroup}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -74,11 +74,11 @@ const Grupos = () => {
         />
       </div>
 
-      {(isAdding || editingGroup) && (
-        <Card className="p-6 bg-white shadow-md border-2 border-blue-100">
+      {isAdding && (
+        <Card className="p-6 bg-white shadow-md border-2 border-blue-100 animate-fade-in">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-slate-800">
-              {isAdding ? 'Novo Grupo' : 'Editar Grupo'}
+              Novo Grupo
             </h2>
             <Button variant="ghost" size="icon" onClick={handleCancelEdit}>
               <X className="h-5 w-5" />
@@ -99,9 +99,9 @@ const Grupos = () => {
             <div className="flex gap-3 pt-2">
               <Button
                 type="submit"
-                className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-md"
+                className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-md"
               >
-                {isAdding ? 'Salvar' : 'Atualizar'}
+                Salvar
               </Button>
               <Button
                 type="button"
@@ -139,6 +139,40 @@ const Grupos = () => {
                 </Button>
               </div>
             </div>
+
+            {editingGroup && editingGroup.id === group.id && (
+              <div className="mt-4 pt-4 border-t border-slate-200 animate-fade-in">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Nome do Grupo</label>
+                    <Input
+                      {...register('name', { required: 'Nome é obrigatório' })}
+                      className="h-12 border-slate-300 bg-slate-50"
+                      placeholder="Nome do grupo"
+                    />
+                    {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+                  </div>
+                  
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      type="submit"
+                      className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-md"
+                    >
+                      <Check className="mr-2 h-4 w-4" />
+                      Atualizar
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 h-12 border-slate-300"
+                      onClick={handleCancelEdit}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            )}
           </Card>
         ))}
       </div>

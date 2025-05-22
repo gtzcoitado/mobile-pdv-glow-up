@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -68,7 +68,7 @@ const Produtos = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-slate-800">Cadastro de Produtos</h1>
         <Button 
-          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg rounded-xl w-full sm:w-auto"
+          className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-lg rounded-xl w-full sm:w-auto"
           onClick={handleAddProduct}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -100,11 +100,11 @@ const Produtos = () => {
         </Select>
       </div>
 
-      {(isAdding || editingProduct) && (
-        <Card className="p-6 bg-white shadow-md border-2 border-blue-100">
+      {isAdding && (
+        <Card className="p-6 bg-white shadow-md border-2 border-blue-100 animate-fade-in">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-slate-800">
-              {isAdding ? 'Novo Produto' : 'Editar Produto'}
+              Novo Produto
             </h2>
             <Button variant="ghost" size="icon" onClick={handleCancelEdit}>
               <X className="h-5 w-5" />
@@ -138,7 +138,7 @@ const Produtos = () => {
               <label className="text-sm font-medium text-slate-700">Grupo</label>
               <Select 
                 onValueChange={(value) => setValue('group', value)} 
-                defaultValue={editingProduct?.group || ''}
+                defaultValue={''}
               >
                 <SelectTrigger className="h-12 border-slate-300 bg-slate-50">
                   <SelectValue placeholder="Selecione um grupo" />
@@ -166,9 +166,9 @@ const Produtos = () => {
             <div className="flex gap-3 pt-2">
               <Button
                 type="submit"
-                className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-md"
+                className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-md"
               >
-                {isAdding ? 'Salvar' : 'Atualizar'}
+                Salvar
               </Button>
               <Button
                 type="button"
@@ -211,6 +211,81 @@ const Produtos = () => {
                 </Button>
               </div>
             </div>
+            
+            {editingProduct && editingProduct.id === product.id && (
+              <div className="mt-4 border-t pt-4 animate-fade-in">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Nome</label>
+                    <Input
+                      {...register('name', { required: 'Nome é obrigatório' })}
+                      className="h-12 border-slate-300 bg-slate-50"
+                      placeholder="Nome do produto"
+                    />
+                    {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Preço (R$)</label>
+                    <Input
+                      {...register('price', { required: 'Preço é obrigatório' })}
+                      type="number"
+                      step="0.01"
+                      className="h-12 border-slate-300 bg-slate-50"
+                      placeholder="0.00"
+                    />
+                    {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Grupo</label>
+                    <Select 
+                      onValueChange={(value) => setValue('group', value)} 
+                      defaultValue={product.group}
+                    >
+                      <SelectTrigger className="h-12 border-slate-300 bg-slate-50">
+                        <SelectValue placeholder="Selecione um grupo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {groups.slice(1).map(group => (
+                          <SelectItem key={group} value={group}>{group}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.group && <p className="text-red-500 text-sm">{errors.group.message}</p>}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Estoque mínimo</label>
+                    <Input
+                      {...register('minStock', { required: 'Estoque mínimo é obrigatório' })}
+                      type="number"
+                      className="h-12 border-slate-300 bg-slate-50"
+                      placeholder="Quantidade mínima"
+                    />
+                    {errors.minStock && <p className="text-red-500 text-sm">{errors.minStock.message}</p>}
+                  </div>
+                  
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      type="submit"
+                      className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-md"
+                    >
+                      <Check className="mr-2 h-4 w-4" />
+                      Atualizar
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 h-12 border-slate-300"
+                      onClick={handleCancelEdit}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            )}
           </Card>
         ))}
       </div>
