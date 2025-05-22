@@ -1,5 +1,5 @@
 
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
@@ -9,7 +9,7 @@ interface HeaderProps {
 
 const Header = ({ sidebarOpen, setSidebarOpen }: HeaderProps) => {
   return (
-    <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white p-4 shadow-lg relative overflow-hidden">
+    <header className="sticky top-0 z-10 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white p-4 shadow-lg relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
       <div className="relative flex items-center justify-between">
         <Button

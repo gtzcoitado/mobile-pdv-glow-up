@@ -16,29 +16,29 @@ const CartItem = ({ name, price, quantity, onIncrease, onDecrease, onRemove }: C
   return (
     <Card className="p-3 bg-white border border-slate-200 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <h4 className="font-medium text-slate-800">{name}</h4>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-slate-800 truncate">{name}</h4>
           <p className="text-sm text-green-600 font-semibold">R$ {price.toFixed(2)}</p>
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 ml-2">
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8 rounded-full border-slate-300 hover:bg-red-50 hover:border-red-300"
+            className="h-7 w-7 rounded-full border-slate-300 hover:bg-red-50 hover:border-red-300 flex-shrink-0"
             onClick={onDecrease}
           >
             <Minus className="h-3 w-3" />
           </Button>
           
-          <span className="w-8 text-center font-semibold text-slate-700">
+          <span className="w-6 text-center font-semibold text-slate-700">
             {quantity}
           </span>
           
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8 rounded-full border-slate-300 hover:bg-green-50 hover:border-green-300"
+            className="h-7 w-7 rounded-full border-slate-300 hover:bg-green-50 hover:border-green-300 flex-shrink-0"
             onClick={onIncrease}
           >
             <Plus className="h-3 w-3" />
@@ -47,7 +47,7 @@ const CartItem = ({ name, price, quantity, onIncrease, onDecrease, onRemove }: C
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8 rounded-full border-slate-300 hover:bg-red-50 hover:border-red-300 ml-2"
+            className="h-7 w-7 rounded-full border-slate-300 hover:bg-red-50 hover:border-red-300 ml-1 flex-shrink-0"
             onClick={onRemove}
           >
             <Trash2 className="h-3 w-3 text-red-500" />
