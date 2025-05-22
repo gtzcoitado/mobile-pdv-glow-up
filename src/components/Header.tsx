@@ -1,5 +1,5 @@
 
-import { Menu, X, ShoppingCart, LogOut } from 'lucide-react';
+import { Menu, X, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,10 +10,6 @@ interface HeaderProps {
 
 const Header = ({ sidebarOpen, setSidebarOpen }: HeaderProps) => {
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    navigate('/login');
-  };
 
   return (
     <header className="sticky top-0 z-10 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 shadow-lg relative overflow-hidden">
@@ -38,14 +34,6 @@ const Header = ({ sidebarOpen, setSidebarOpen }: HeaderProps) => {
             NEW RIFT
           </h1>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white hover:bg-white/10 transition-all duration-200"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-5 w-5" />
-        </Button>
       </div>
     </header>
   );
