@@ -1,5 +1,5 @@
 
-import { Home, Package, Users, BarChart3, UserCog, LogOut, Folder } from 'lucide-react';
+import { Home, Package, Users, BarChart3, UserCog, LogOut, Folder, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -18,6 +18,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     { icon: Folder, label: 'Grupos', path: '/grupos' },
     { icon: BarChart3, label: 'Estoque', path: '/estoque' },
     { icon: UserCog, label: 'Funcionários', path: '/funcionarios' },
+    { icon: DollarSign, label: 'Financeiro', path: '/financeiro' },
     { icon: Users, label: 'Relatórios', path: '/relatorios' },
   ];
 
@@ -38,14 +39,14 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
       
       {/* Sidebar */}
       <div className={`
-        fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-gradient-to-b from-slate-800 to-slate-900 
+        fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-gradient-to-b from-slate-800 to-slate-900 dark:from-slate-900 dark:to-slate-950
         transform transition-transform duration-300 ease-out z-50 shadow-2xl
         ${open ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 lg:static lg:w-64
+        lg:translate-x-0 lg:static lg:w-64 lg:h-screen
       `}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-slate-700">
+          <div className="p-6 border-b border-slate-700 dark:border-slate-800">
             <h2 className="text-xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               PDV NEW RIFT
             </h2>
@@ -74,17 +75,6 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
               );
             })}
           </nav>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-slate-700">
-            <Button
-              variant="ghost"
-              className="w-full justify-start h-12 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all duration-200"
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Sair
-            </Button>
-          </div>
         </div>
       </div>
     </>

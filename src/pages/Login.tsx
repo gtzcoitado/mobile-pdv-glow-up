@@ -1,310 +1,186 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LogIn, Building2, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Lock, User, Moon, Sun } from 'lucide-react';
-import { useTheme } from '@/hooks/use-theme';
+import { useToast } from '@/hooks/use-toast';
+import Loading from '@/components/Loading';
 
 const Login = () => {
-  const [view, setView] = useState<'company' | 'user'>('company');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [companyCode, setCompanyCode] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-  const [particles, setParticles] = useState<{ id: number; x: number; y: number; size: number; speed: number; opacity: number; }[]>([]);
-  const [connectors, setConnectors] = useState<{ id: number; x1: number; y1: number; x2: number; y2: number; opacity: number; }[]>([]);
-  
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
+  
+  const [loginType, setLoginType] = useState<'company' | 'user'>('company');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
 
-  // Create animated technology-themed particles and connections
-  useEffect(() => {
-    const particleCount = 20;
-    const newParticles = Array.from({ length: particleCount }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 3 + 1,
-      speed: Math.random() * 0.5 + 0.2,
-      opacity: Math.random() * 0.5 + 0.3
-    }));
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
     
-    setParticles(newParticles);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Create connections between particles
-    const newConnectors: typeof connectors = [];
-    for (let i = 0; i < particleCount; i++) {
-      const particleA = newParticles[i];
-      
-      // Connect to 1-3 nearest particles
-      for (let j = 0; j < Math.floor(Math.random() * 3) + 1; j++) {
-        const particleB = newParticles[(i + j + 1) % particleCount];
-        
-        newConnectors.push({
-          id: newConnectors.length,
-          x1: particleA.x,
-          y1: particleA.y,
-          x2: particleB.x,
-          y2: particleB.y,
-          opacity: Math.random() * 0.2 + 0.1
-        });
-      }
-    }
+    toast({
+      title: "Login realizado com sucesso!",
+      description: `Bem-vindo ao sistema ${loginType === 'company' ? 'empresarial' : 'de usuário'}`,
+    });
     
-    setConnectors(newConnectors);
-    
-    const interval = setInterval(() => {
-      setParticles(prev => prev.map(particle => ({
-        ...particle,
-        y: particle.y - particle.speed,
-        x: particle.x + Math.sin(particle.y / 20) * 0.2,
-      })).map(particle => {
-        if (particle.y < -5) {
-          return {
-            ...particle,
-            y: 105,
-            x: Math.random() * 100
-          };
-        }
-        return particle;
-      }));
-      
-      // Update connectors based on new particle positions
-      setConnectors(prev => {
-        const updatedConnectors = [...prev];
-        newParticles.forEach((particle, i) => {
-          // Find connectors that use this particle
-          updatedConnectors.forEach((connector, j) => {
-            if (connector.x1 === particle.x && connector.y1 === particle.y) {
-              updatedConnectors[j] = {
-                ...connector,
-                x1: newParticles[i].x,
-                y1: newParticles[i].y
-              };
-            }
-            if (connector.x2 === particle.x && connector.y2 === particle.y) {
-              updatedConnectors[j] = {
-                ...connector,
-                x2: newParticles[i].x,
-                y2: newParticles[i].y
-              };
-            }
-          });
-        });
-        return updatedConnectors;
-      });
-    }, 50);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleLogin = () => {
-    // Just navigate to main page for demonstration
+    setLoading(false);
     navigate('/');
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+  const techParticles = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    size: Math.random() * 4 + 2,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    duration: Math.random() * 20 + 10,
+    delay: Math.random() * 5,
+  }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 dark:from-blue-950 dark:via-blue-900 dark:to-blue-800 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Theme toggle button */}
-      <button 
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 p-2 rounded-full bg-white/10 backdrop-blur-sm z-20 text-white hover:bg-white/20 transition-colors"
-      >
-        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-      </button>
-
-      {/* Animated particles */}
-      {particles.map((particle) => (
-        <div 
-          key={`particle-${particle.id}`}
-          className="absolute rounded-full bg-blue-400/30 dark:bg-blue-300/30 backdrop-blur-sm"
-          style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-            opacity: particle.opacity,
-            transition: 'all 0.5s linear'
-          }}
-        />
-      ))}
-
-      {/* Connectors between particles */}
-      <svg className="absolute inset-0 w-full h-full z-0">
-        {connectors.map((connector) => (
-          <line
-            key={`connector-${connector.id}`}
-            x1={`${connector.x1}%`}
-            y1={`${connector.y1}%`}
-            x2={`${connector.x2}%`}
-            y2={`${connector.y2}%`}
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth="0.5"
-            strokeOpacity={connector.opacity}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 dark:from-slate-950 dark:via-blue-950 dark:to-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Tech Animation Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        {techParticles.map((particle) => (
+          <div
+            key={particle.id}
+            className="absolute rounded-full bg-blue-400/20 dark:bg-blue-300/10 animate-pulse"
+            style={{
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              left: `${particle.x}%`,
+              top: `${particle.y}%`,
+              animationDuration: `${particle.duration}s`,
+              animationDelay: `${particle.delay}s`,
+            }}
           />
         ))}
-      </svg>
+        
+        {/* Floating tech elements */}
+        <div className="absolute top-20 left-20 w-2 h-2 bg-cyan-400/30 rounded-full animate-ping" />
+        <div className="absolute top-40 right-32 w-1 h-1 bg-green-400/40 rounded-full animate-pulse" />
+        <div className="absolute bottom-32 left-40 w-3 h-3 bg-purple-400/20 rounded-full animate-bounce" />
+        <div className="absolute bottom-20 right-20 w-2 h-2 bg-yellow-400/30 rounded-full animate-ping" />
+      </div>
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="flex justify-center mb-4">
-            {/* Your New Rift logo */}
-            <svg width="80" height="80" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" className="animate-pulse">
-              <path d="M200 0L350 150H250L150 50L200 0Z" fill="white"/>
-              <path d="M250 150V350C250 350 350 350 350 250C350 150 250 150 250 150Z" fill="white"/>
-            </svg>
+      <Card className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 backdrop-blur-lg shadow-2xl border-0">
+        <div className="p-8 space-y-6">
+          {/* Logo and Header */}
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <img 
+                src="/lovable-uploads/b5425ad5-b90b-4dc0-8e59-5d6e2ae9c5a1.png" 
+                alt="NEW RIFT Logo" 
+                className="w-12 h-12 object-contain"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800 dark:text-white">NEW RIFT</h1>
+              <p className="text-slate-600 dark:text-slate-300">
+                {loginType === 'company' ? 'Login Empresarial' : 'Login de Usuário'}
+              </p>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-            NEW RIFT
-          </h1>
-          <p className="text-blue-200 mt-2">Sistema de vendas</p>
+
+          {/* Login Type Toggle */}
+          <div className="flex bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
+            <button
+              type="button"
+              onClick={() => setLoginType('company')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all ${
+                loginType === 'company'
+                  ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              <Building2 className="h-4 w-4" />
+              Empresa
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginType('user')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all ${
+                loginType === 'user'
+                  ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              <User className="h-4 w-4" />
+              Usuário
+            </button>
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                {loginType === 'company' ? 'Email Empresarial' : 'Email'}
+              </label>
+              <Input
+                type="email"
+                placeholder={loginType === 'company' ? 'empresa@exemplo.com' : 'usuario@exemplo.com'}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="h-12 dark:bg-slate-700 dark:border-slate-600"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Senha</label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Sua senha"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="h-12 pr-12 dark:bg-slate-700 dark:border-slate-600"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
+            >
+              {loading ? (
+                <Loading text="Entrando..." />
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-5 w-5" />
+                  Entrar
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Footer */}
+          <div className="text-center text-sm text-slate-500 dark:text-slate-400">
+            {loginType === 'company' ? (
+              <p>Acesso exclusivo para empresas cadastradas</p>
+            ) : (
+              <p>Entre com suas credenciais de usuário</p>
+            )}
+          </div>
         </div>
-
-        {view === 'company' ? (
-          <Card className="p-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm shadow-xl shadow-blue-900/30 dark:shadow-blue-950/50 border-none rounded-xl animate-scale-in">
-            <div className="flex mb-6 border-b border-slate-200 dark:border-slate-700">
-              <button
-                className={`pb-3 px-4 font-medium text-sm transition-colors duration-200 ${
-                  view === 'company'
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
-                }`}
-                onClick={() => setView('company')}
-              >
-                Login da Empresa
-              </button>
-              <button
-                className={`pb-3 px-4 font-medium text-sm transition-colors duration-200 ${
-                  view === 'user'
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
-                }`}
-                onClick={() => setView('user')}
-              >
-                Login do Usuário
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-200">CNPJ ou Código</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-5 w-5" />
-                  <Input
-                    type="text"
-                    placeholder="Digite o CNPJ ou código da empresa"
-                    value={companyCode}
-                    onChange={(e) => setCompanyCode(e.target.value)}
-                    className="pl-10 h-12 bg-slate-50 dark:bg-slate-800 rounded-xl focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center">
-                <Checkbox 
-                  id="company-remember" 
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked === true)}
-                />
-                <label htmlFor="company-remember" className="ml-2 text-sm text-slate-600 dark:text-slate-400">
-                  Manter conectado
-                </label>
-              </div>
-            </div>
-
-            <Button 
-              className="w-full mt-6 h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              onClick={() => setView('user')}
-            >
-              Avançar
-            </Button>
-          </Card>
-        ) : (
-          <Card className="p-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm shadow-xl shadow-blue-900/30 dark:shadow-blue-950/50 border-none rounded-xl animate-scale-in">
-            <div className="flex mb-6 border-b border-slate-200 dark:border-slate-700">
-              <button
-                className={`pb-3 px-4 font-medium text-sm transition-colors duration-200 ${
-                  view === 'company'
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
-                }`}
-                onClick={() => setView('company')}
-              >
-                Login da Empresa
-              </button>
-              <button
-                className={`pb-3 px-4 font-medium text-sm transition-colors duration-200 ${
-                  view === 'user'
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
-                }`}
-                onClick={() => setView('user')}
-              >
-                Login do Usuário
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Usuário</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-5 w-5" />
-                  <Input
-                    type="text"
-                    placeholder="Digite seu usuário"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="pl-10 h-12 bg-slate-50 dark:bg-slate-800 rounded-xl focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Senha</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-5 w-5" />
-                  <Input
-                    type="password"
-                    placeholder="Digite sua senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-12 bg-slate-50 dark:bg-slate-800 rounded-xl focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center">
-                <Checkbox 
-                  id="user-remember" 
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked === true)}
-                />
-                <label htmlFor="user-remember" className="ml-2 text-sm text-slate-600 dark:text-slate-400">
-                  Manter conectado
-                </label>
-              </div>
-            </div>
-
-            <Button 
-              className="w-full mt-6 h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              onClick={handleLogin}
-            >
-              Entrar
-            </Button>
-          </Card>
-        )}
-      </div>
-      
-      <div className="text-blue-300/70 dark:text-blue-200/70 mt-4 text-sm">
-        © 2025 New Rift Technology
-      </div>
+      </Card>
     </div>
   );
 };
