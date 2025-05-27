@@ -59,29 +59,29 @@ const Estoque = () => {
   });
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
       <div className="flex items-center gap-3">
-        <Package className="h-8 w-8 text-blue-600" />
+        <Package className="h-8 w-8 text-blue-600 dark:text-blue-400" />
         <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Controle de Estoque</h1>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-5 w-5" />
           <Input
             placeholder="Buscar produto"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:bg-slate-800"
+            className="pl-10 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-700 focus:border-blue-400 dark:focus:border-blue-500 dark:bg-slate-800 dark:text-white"
           />
         </div>
         <Select value={selectedGroup} onValueChange={setSelectedGroup}>
-          <SelectTrigger className="w-full sm:w-48 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-600 dark:bg-slate-800">
+          <SelectTrigger className="w-full sm:w-48 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
             {groups.map(group => (
-              <SelectItem key={group} value={group.toLowerCase().replace(/\s+/g, '-')}>
+              <SelectItem key={group} value={group.toLowerCase().replace(/\s+/g, '-')} className="dark:text-white dark:hover:bg-slate-700">
                 {group}
               </SelectItem>
             ))}
@@ -91,7 +91,7 @@ const Estoque = () => {
 
       <div className="space-y-4">
         {filteredProducts.map(product => (
-          <Card key={product.id} className="p-6 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg">
+          <Card key={product.id} className="p-6 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-500/10">
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{product.name}</h3>
@@ -122,7 +122,7 @@ const Estoque = () => {
                       placeholder="1"
                       value={quantities[product.id] || ''}
                       onChange={(e) => setQuantities(prev => ({ ...prev, [product.id]: e.target.value }))}
-                      className="mt-1 dark:bg-slate-700 dark:border-slate-600"
+                      className="mt-1 dark:bg-slate-700 dark:border-slate-600 dark:text-white"
                     />
                   </div>
 
@@ -145,7 +145,7 @@ const Estoque = () => {
                       onClick={() => handleStockAdjustment(product.id, 'out')}
                       disabled={adjustingStock !== null}
                       variant="outline"
-                      className="flex-1 border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
+                      className="flex-1 border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       <Minus className="mr-2 h-4 w-4" />
                       Saída

@@ -27,6 +27,11 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     onClose();
   };
 
+  const handleLogout = () => {
+    navigate('/login');
+    onClose();
+  };
+
   return (
     <>
       {/* Overlay */}
@@ -75,6 +80,18 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
               );
             })}
           </nav>
+
+          {/* Logout Button */}
+          <div className="p-4 border-t border-slate-700 dark:border-slate-800">
+            <Button
+              variant="ghost"
+              className="w-full justify-start h-12 text-left transition-all duration-200 rounded-xl text-red-300 hover:text-red-100 hover:bg-red-600/20"
+              onClick={handleLogout}
+            >
+              <LogOut className="mr-3 h-5 w-5" />
+              Sair
+            </Button>
+          </div>
         </div>
       </div>
     </>

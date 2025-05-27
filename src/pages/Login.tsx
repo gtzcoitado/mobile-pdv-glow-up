@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, Building2, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,16 +12,75 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [loginType, setLoginType] = useState<'company' | 'user'>('company');
+  const [step, setStep] = useState<'company' | 'user'>('company');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    companyCode: '',
+    username: '',
     password: ''
   });
 
-  const handleLogin = async (e: React.FormEvent) => {
+  // Detectar modo escuro baseado no horário
+  useEffect(() => {
+    const checkTimeOfDay = () => {
+      const hour = new Date().getHours();
+      // Modo escuro das 18h às 6h
+      const shouldBeDark = hour >= 18 || hour < 6;
+      setIsDarkMode(shouldBeDark);
+      
+      // Aplicar o tema ao documento
+      if (shouldBeDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    checkTimeOfDay();
+    // Verificar a cada minuto
+    const interval = setInterval(checkTimeOfDay, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleCompanyLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.companyCode.trim()) {
+      toast({
+        title: "Erro",
+        description: "Informe o código da empresa ou CNPJ",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    toast({
+      title: "Empresa encontrada!",
+      description: "Agora faça o login do usuário",
+    });
+    
+    setLoading(false);
+    setStep('user');
+  };
+
+  const handleUserLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.username.trim() || !formData.password.trim()) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     
     // Simulate API call
@@ -29,7 +88,7 @@ const Login = () => {
     
     toast({
       title: "Login realizado com sucesso!",
-      description: `Bem-vindo ao sistema ${loginType === 'company' ? 'empresarial' : 'de usuário'}`,
+      description: "Bem-vindo ao sistema",
     });
     
     setLoading(false);
@@ -46,13 +105,19 @@ const Login = () => {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 dark:from-slate-950 dark:via-blue-950 dark:to-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className={`min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-all duration-1000 ${
+      isDarkMode 
+        ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900' 
+        : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'
+    }`}>
       {/* Tech Animation Background */}
       <div className="absolute inset-0 overflow-hidden">
         {techParticles.map((particle) => (
           <div
             key={particle.id}
-            className="absolute rounded-full bg-blue-400/20 dark:bg-blue-300/10 animate-pulse"
+            className={`absolute rounded-full animate-pulse ${
+              isDarkMode ? 'bg-blue-400/20' : 'bg-blue-600/10'
+            }`}
             style={{
               width: `${particle.size}px`,
               height: `${particle.size}px`,
@@ -65,17 +130,31 @@ const Login = () => {
         ))}
         
         {/* Floating tech elements */}
-        <div className="absolute top-20 left-20 w-2 h-2 bg-cyan-400/30 rounded-full animate-ping" />
-        <div className="absolute top-40 right-32 w-1 h-1 bg-green-400/40 rounded-full animate-pulse" />
-        <div className="absolute bottom-32 left-40 w-3 h-3 bg-purple-400/20 rounded-full animate-bounce" />
-        <div className="absolute bottom-20 right-20 w-2 h-2 bg-yellow-400/30 rounded-full animate-ping" />
+        <div className={`absolute top-20 left-20 w-2 h-2 rounded-full animate-ping ${
+          isDarkMode ? 'bg-cyan-400/30' : 'bg-cyan-600/40'
+        }`} />
+        <div className={`absolute top-40 right-32 w-1 h-1 rounded-full animate-pulse ${
+          isDarkMode ? 'bg-green-400/40' : 'bg-green-600/50'
+        }`} />
+        <div className={`absolute bottom-32 left-40 w-3 h-3 rounded-full animate-bounce ${
+          isDarkMode ? 'bg-purple-400/20' : 'bg-purple-600/30'
+        }`} />
+        <div className={`absolute bottom-20 right-20 w-2 h-2 rounded-full animate-ping ${
+          isDarkMode ? 'bg-yellow-400/30' : 'bg-yellow-600/40'
+        }`} />
       </div>
 
-      <Card className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 backdrop-blur-lg shadow-2xl border-0">
+      <Card className={`w-full max-w-md shadow-2xl border-0 transition-all duration-500 ${
+        isDarkMode 
+          ? 'bg-slate-800/95 backdrop-blur-lg' 
+          : 'bg-white/95 backdrop-blur-lg'
+      }`}>
         <div className="p-8 space-y-6">
           {/* Logo and Header */}
           <div className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className={`mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center transition-all duration-500 ${
+              isDarkMode ? 'shadow-lg shadow-blue-500/25' : 'shadow-lg shadow-blue-500/15'
+            }`}>
               <img 
                 src="/lovable-uploads/b5425ad5-b90b-4dc0-8e59-5d6e2ae9c5a1.png" 
                 alt="NEW RIFT Logo" 
@@ -83,98 +162,146 @@ const Login = () => {
               />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-800 dark:text-white">NEW RIFT</h1>
-              <p className="text-slate-600 dark:text-slate-300">
-                {loginType === 'company' ? 'Login Empresarial' : 'Login de Usuário'}
+              <h1 className={`text-2xl font-bold transition-colors duration-500 ${
+                isDarkMode ? 'text-white' : 'text-slate-800'
+              }`}>NEW RIFT</h1>
+              <p className={`transition-colors duration-500 ${
+                isDarkMode ? 'text-slate-300' : 'text-slate-600'
+              }`}>
+                {step === 'company' ? 'Código da Empresa' : 'Login de Usuário'}
               </p>
             </div>
           </div>
 
-          {/* Login Type Toggle */}
-          <div className="flex bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
-            <button
-              type="button"
-              onClick={() => setLoginType('company')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all ${
-                loginType === 'company'
-                  ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-300'
-              }`}
-            >
-              <Building2 className="h-4 w-4" />
-              Empresa
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginType('user')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all ${
-                loginType === 'user'
-                  ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-300'
-              }`}
-            >
-              <User className="h-4 w-4" />
-              Usuário
-            </button>
-          </div>
-
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                {loginType === 'company' ? 'Email Empresarial' : 'Email'}
-              </label>
-              <Input
-                type="email"
-                placeholder={loginType === 'company' ? 'empresa@exemplo.com' : 'usuario@exemplo.com'}
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="h-12 dark:bg-slate-700 dark:border-slate-600"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Senha</label>
-              <div className="relative">
+          {step === 'company' ? (
+            /* Company Code Form */
+            <form onSubmit={handleCompanyLogin} className="space-y-4">
+              <div className="space-y-2">
+                <label className={`text-sm font-medium transition-colors duration-500 ${
+                  isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                }`}>
+                  Código de empresa ou CNPJ
+                </label>
                 <Input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Sua senha"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="h-12 pr-12 dark:bg-slate-700 dark:border-slate-600"
+                  type="text"
+                  placeholder="Digite o código da empresa ou CNPJ"
+                  value={formData.companyCode}
+                  onChange={(e) => setFormData({ ...formData, companyCode: e.target.value })}
+                  className={`h-12 transition-all duration-500 ${
+                    isDarkMode 
+                      ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-400' 
+                      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-500'
+                  }`}
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
               </div>
-            </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
-            >
-              {loading ? (
-                <Loading text="Entrando..." />
-              ) : (
-                <>
-                  <LogIn className="mr-2 h-5 w-5" />
-                  Entrar
-                </>
-              )}
-            </Button>
-          </form>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-300"
+              >
+                {loading ? (
+                  <Loading text="Verificando..." />
+                ) : (
+                  <>
+                    <Building2 className="mr-2 h-5 w-5" />
+                    Continuar
+                  </>
+                )}
+              </Button>
+            </form>
+          ) : (
+            /* User Login Form */
+            <form onSubmit={handleUserLogin} className="space-y-4">
+              <div className="space-y-2">
+                <label className={`text-sm font-medium transition-colors duration-500 ${
+                  isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                }`}>
+                  Nome de usuário
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Digite seu nome de usuário"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className={`h-12 transition-all duration-500 ${
+                    isDarkMode 
+                      ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-400' 
+                      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-500'
+                  }`}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className={`text-sm font-medium transition-colors duration-500 ${
+                  isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                }`}>Senha</label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Sua senha"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className={`h-12 pr-12 transition-all duration-500 ${
+                      isDarkMode 
+                        ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-400' 
+                        : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-500'
+                    }`}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-500 ${
+                      isDarkMode 
+                        ? 'text-slate-400 hover:text-slate-300' 
+                        : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setStep('company')}
+                  className={`flex-1 h-12 transition-all duration-500 ${
+                    isDarkMode 
+                      ? 'border-slate-600 text-slate-300 hover:bg-slate-700' 
+                      : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  Voltar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-300"
+                >
+                  {loading ? (
+                    <Loading text="Entrando..." />
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-5 w-5" />
+                      Entrar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
 
           {/* Footer */}
-          <div className="text-center text-sm text-slate-500 dark:text-slate-400">
-            {loginType === 'company' ? (
-              <p>Acesso exclusivo para empresas cadastradas</p>
+          <div className={`text-center text-sm transition-colors duration-500 ${
+            isDarkMode ? 'text-slate-400' : 'text-slate-500'
+          }`}>
+            {step === 'company' ? (
+              <p>Digite o código da empresa para continuar</p>
             ) : (
               <p>Entre com suas credenciais de usuário</p>
             )}

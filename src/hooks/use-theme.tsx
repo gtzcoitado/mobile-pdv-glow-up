@@ -37,16 +37,23 @@ export function ThemeProvider({
     root.classList.remove('light', 'dark');
     
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
-        ? 'dark'
-        : 'light';
-      
+      // Sistema automático baseado no horário
+      const hour = new Date().getHours();
+      const systemTheme = (hour >= 18 || hour < 6) ? 'dark' : 'light';
       root.classList.add(systemTheme);
-      return;
+      
+      // Atualizar a cada minuto
+      const interval = setInterval(() => {
+        const currentHour = new Date().getHours();
+        const newTheme = (currentHour >= 18 || currentHour < 6) ? 'dark' : 'light';
+        root.classList.remove('light', 'dark');
+        root.classList.add(newTheme);
+      }, 60000);
+      
+      return () => clearInterval(interval);
+    } else {
+      root.classList.add(theme);
     }
-    
-    root.classList.add(theme);
   }, [theme]);
 
   const value = {
