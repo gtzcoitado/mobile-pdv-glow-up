@@ -1,49 +1,55 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, Building2, User, Eye, EyeOff } from 'lucide-react';
+import { LogIn, Building2, User, Eye, EyeOff, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/hooks/use-theme';
 import Loading from '@/components/Loading';
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   
   const [step, setStep] = useState<'company' | 'user'>('company');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [formData, setFormData] = useState({
     companyCode: '',
     username: '',
     password: ''
   });
 
-  // Detectar modo escuro baseado no horário
-  useEffect(() => {
-    const checkTimeOfDay = () => {
-      const hour = new Date().getHours();
-      // Modo escuro das 18h às 6h
-      const shouldBeDark = hour >= 18 || hour < 6;
-      setIsDarkMode(shouldBeDark);
-      
-      // Aplicar o tema ao documento
-      if (shouldBeDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    };
+  // Verificar se está no modo escuro (baseado no tema ou horário)
+  const isDarkMode = theme === 'dark' || (theme === 'system' && (() => {
+    const hour = new Date().getHours();
+    return hour >= 18 || hour < 6;
+  })());
 
-    checkTimeOfDay();
-    // Verificar a cada minuto
-    const interval = setInterval(checkTimeOfDay, 60000);
-    
-    return () => clearInterval(interval);
-  }, []);
+  const toggleTheme = () => {
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('system');
+    } else {
+      setTheme('light');
+    }
+  };
+
+  const getThemeIcon = () => {
+    if (theme === 'light') return Sun;
+    if (theme === 'dark') return Moon;
+    return isDarkMode ? Moon : Sun;
+  };
+
+  const getThemeLabel = () => {
+    if (theme === 'light') return 'Claro';
+    if (theme === 'dark') return 'Escuro';
+    return 'Auto';
+  };
 
   const handleCompanyLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,12 +110,29 @@ const Login = () => {
     delay: Math.random() * 5,
   }));
 
+  const ThemeIcon = getThemeIcon();
+
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-all duration-1000 ${
       isDarkMode 
         ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900' 
         : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'
     }`}>
+      {/* Theme Toggle Button */}
+      <Button
+        onClick={toggleTheme}
+        variant="outline"
+        size="sm"
+        className={`fixed top-4 right-4 z-50 transition-all duration-300 ${
+          isDarkMode 
+            ? 'bg-slate-800/90 border-slate-600 text-slate-200 hover:bg-slate-700/90 hover:text-white' 
+            : 'bg-white/90 border-slate-300 text-slate-700 hover:bg-slate-50/90'
+        }`}
+      >
+        <ThemeIcon className="h-4 w-4 mr-2" />
+        {getThemeLabel()}
+      </Button>
+
       {/* Tech Animation Background */}
       <div className="absolute inset-0 overflow-hidden">
         {techParticles.map((particle) => (
@@ -146,7 +169,7 @@ const Login = () => {
 
       <Card className={`w-full max-w-md shadow-2xl border-0 transition-all duration-500 ${
         isDarkMode 
-          ? 'bg-slate-800/95 backdrop-blur-lg' 
+          ? 'bg-slate-800/95 backdrop-blur-lg border-slate-700/50' 
           : 'bg-white/95 backdrop-blur-lg'
       }`}>
         <div className="p-8 space-y-6">
@@ -189,8 +212,8 @@ const Login = () => {
                   onChange={(e) => setFormData({ ...formData, companyCode: e.target.value })}
                   className={`h-12 transition-all duration-500 ${
                     isDarkMode 
-                      ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-400' 
-                      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-500'
+                      ? 'bg-slate-700/80 border-slate-600 text-slate-200 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20' 
+                      : 'bg-white/90 border-slate-300 text-slate-900 placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20'
                   }`}
                   required
                 />
@@ -227,8 +250,8 @@ const Login = () => {
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   className={`h-12 transition-all duration-500 ${
                     isDarkMode 
-                      ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-400' 
-                      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-500'
+                      ? 'bg-slate-700/80 border-slate-600 text-slate-200 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20' 
+                      : 'bg-white/90 border-slate-300 text-slate-900 placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20'
                   }`}
                   required
                 />
@@ -246,8 +269,8 @@ const Login = () => {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     className={`h-12 pr-12 transition-all duration-500 ${
                       isDarkMode 
-                        ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-400' 
-                        : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-500'
+                        ? 'bg-slate-700/80 border-slate-600 text-slate-200 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20' 
+                        : 'bg-white/90 border-slate-300 text-slate-900 placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20'
                     }`}
                     required
                   />
@@ -256,7 +279,7 @@ const Login = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-500 ${
                       isDarkMode 
-                        ? 'text-slate-400 hover:text-slate-300' 
+                        ? 'text-slate-400 hover:text-slate-200' 
                         : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
@@ -272,7 +295,7 @@ const Login = () => {
                   onClick={() => setStep('company')}
                   className={`flex-1 h-12 transition-all duration-500 ${
                     isDarkMode 
-                      ? 'border-slate-600 text-slate-300 hover:bg-slate-700' 
+                      ? 'border-slate-600 text-slate-300 hover:bg-slate-700/50 hover:text-slate-200 bg-slate-800/50' 
                       : 'border-slate-300 text-slate-600 hover:bg-slate-50'
                   }`}
                 >
