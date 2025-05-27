@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,19 +36,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -97,5 +91,39 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Estilos específicos para modo escuro - remover elementos brancos */
+  .dark input[type="text"],
+  .dark input[type="password"],
+  .dark input[type="email"],
+  .dark input[type="number"],
+  .dark input[type="date"],
+  .dark textarea,
+  .dark select {
+    @apply bg-slate-800 border-slate-600 text-slate-200 placeholder:text-slate-400;
+  }
+
+  .dark input[type="text"]:focus,
+  .dark input[type="password"]:focus,
+  .dark input[type="email"]:focus,
+  .dark input[type="number"]:focus,
+  .dark input[type="date"]:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    @apply border-blue-500 ring-blue-500/20;
+  }
+
+  /* Componentes shadcn/ui no modo escuro */
+  .dark [data-radix-select-trigger] {
+    @apply bg-slate-800 border-slate-600 text-slate-200;
+  }
+
+  .dark [data-radix-select-content] {
+    @apply bg-slate-800 border-slate-600;
+  }
+
+  .dark [data-radix-select-item] {
+    @apply text-slate-200 hover:bg-slate-700;
   }
 }
