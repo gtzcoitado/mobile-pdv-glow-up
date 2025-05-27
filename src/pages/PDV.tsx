@@ -1,11 +1,13 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductCard from '@/components/ProductCard';
 import CartItem from '@/components/CartItem';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Search, ShoppingCart, ArrowLeft } from 'lucide-react';
+import Loading from '@/components/Loading';
 
 interface CartItemType {
   id: string;
@@ -23,9 +25,11 @@ interface ProductType {
 }
 
 const PDV = () => {
+  const navigate = useNavigate();
   const [cart, setCart] = useState<CartItemType[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   
   const products: ProductType[] = [
     { id: '1', name: 'Brahma', price: 5.00, group: 'Geral', stock: 134 },
@@ -39,7 +43,12 @@ const PDV = () => {
   // Get unique groups from products
   const groups = Array.from(new Set(products.map(product => product.group)));
 
-  const addToCart = (product: ProductType) => {
+  const addToCart = async (product: ProductType) => {
+    setLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {
@@ -51,9 +60,16 @@ const PDV = () => {
       }
       return [...prev, { ...product, quantity: 1 }];
     });
+    
+    setLoading(false);
   };
 
-  const updateQuantity = (id: string, change: number) => {
+  const updateQuantity = async (id: string, change: number) => {
+    setLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     setCart(prev =>
       prev.map(item =>
         item.id === id
@@ -61,10 +77,26 @@ const PDV = () => {
           : item
       ).filter(item => item.quantity > 0)
     );
+    
+    setLoading(false);
   };
 
-  const removeFromCart = (id: string) => {
+  const removeFromCart = async (id: string) => {
+    setLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     setCart(prev => prev.filter(item => item.id !== id));
+    setLoading(false);
+  };
+
+  const goToPayment = () => {
+    if (cart.length === 0) return;
+    
+    navigate('/pagamento', {
+      state: { cart }
+    });
   };
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -158,6 +190,12 @@ const PDV = () => {
               </span>
             </div>
 
+            {loading && (
+              <div className="flex justify-center py-4">
+                <Loading text="Atualizando..." />
+              </div>
+            )}
+
             <div className="space-y-3 max-h-60 lg:max-h-96 overflow-y-auto">
               {cart.length === 0 ? (
                 <p className="text-center text-slate-500 py-8">Carrinho vazio</p>
@@ -186,9 +224,14 @@ const PDV = () => {
               
               <Button 
                 className="w-full h-12 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-                disabled={cart.length === 0}
+                disabled={cart.length === 0 || loading}
+                onClick={goToPayment}
               >
-                Ir para Pagamento
+                {loading ? (
+                  <Loading text="Carregando..." />
+                ) : (
+                  "Ir para Pagamento"
+                )}
               </Button>
             </div>
           </Card>
